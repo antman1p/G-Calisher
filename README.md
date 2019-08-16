@@ -6,4 +6,5 @@ Author: Antonio Piazza (@antman1p)
 This is a python version of the powershell Mailsniper module Invoke-InjectGEventAPI written by BlackHills Security's 
 Beau Bullock (@dafthack) & Michael Felch (@ustayready)
 ## Why?
-Becasue I'm a MacOS hacker and not everything is effing windows!
+Becasue I'm a MacOS hacker and not everything is effing windows!  Also, Google STIll, since October 2018 has NOT FIXED 
+THEIR SH**!
