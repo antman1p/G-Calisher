@@ -1,50 +1,112 @@
 import requests
-import argparse
+import sys, getopt
 
-parser = argparse.ArgumentParser(description='This module will connect to '
-    + 'Google\'s API using an access token and inject a calendar event into a '
-    + 'target\'s calendar.')
-parser.add_argument('-e', '--attacker_email', required=True, type=str,
-    help='Email address of the Google account you are doing the injection as.'
-    + ' (Attacker email address)', nargs=1)
-parser.add_argument('-x', '--targets', required=True, type=str,
-    help='Comma-seperated list of victim email addresses', nargs='+')
-parser.add_argument('-a', '--access_token', required=True, type=str,
-    help='Google API Access Token.', nargs=1)
-parser.add_argument('-s', '--start_DateTime', required=True, type=str,
-    help='Start date and time for the event in the format of YYYY-MM-DDTHH:MM:SS'
-    + 'like this: 2019-08-16T20:00:00 for August 16, 2019 at 8:00:00 PM',
-    nargs=1)
-parser.add_argument('-f', '--finish_DateTime', required=True, type=str,
-    help='Finish date and time for the event in the format of YYYY-MM-DDTHH:MM:SS'
-    + 'like this: 2019-08-16T20:00:00 for August 16, 2019 at 8:00:00 PM',
-    nargs=1)
-parser.add_argument('-t', '--event_title', required=False, type=str,
-    help='Title of the Google calendar event')
-parser.add_argument('-l', '--event_location', required=False, type=str,
-    help='Location field for the event')
-parser.add_argument('-d', '--event_description', required=False, type=str,
-    help='Description field for the event')
-parser.add_argument('-z', '--time_zone', required=False, type=str,
-    default='America/New_York', help='Time zone for the event in the format '
-    + '"America/New_York" (default: %(default)s)', nargs='?')
-parser.add_argument('-m', '--allow_modify', required=False, type=str,
-    default='false', help='If set to true allows targets to modify the calendar '
-    + 'entry (default: %(default)s)', nargs='?')
-parser.add_argument('-i', '--allow_invite_others', required=False, type=str,
-    default='true', help='If set to true allows targets to invite others to the '
-    + 'calendar entry (default: %(default)s)', nargs='?')
-parser.add_argument('-o', '--show_invitees', required=False, type=str,
-   default='false', help='If set to true will show all guests added to the '
-   + 'event (default: %(default)s)', nargs='?')
-parser.add_argument('-r', '--response_status', required=False, type=str,
-    default='accepted', choices=['needsAction', 'declined', 'tentative',
-    'accepted'], help='Can be "needsAction", "declined", "tentative", or '
-    + '"accepted" (default: %(default)s)', nargs='?')
+def main(argv):
+    attacker_email = ''
+    access_token = ''
+    targets = ''
+    start_DateTime = ''
+    finish_DateTime = ''
+    event_title = ''
+    event_location = ''
+    event_description = ''
+    time_zone = "America/New_York"
+    allow_modify = "false"
+    allow_invite_others = "true"
+    show_invitees = "false"
+    response_status = "accepted"
 
+    # usage
+    usage = '\nusage: gcalisher.py [-h] -e <ATTACKER EMAIL> -x <TARGETS> [TARGETS, ...]\n'
+    usage += '\t-a <ACCESS TOKEN> -s <START DATETIME> -f <FINISH DATETIME>\n'
+    usage += '\t[-t <EVENT TITLE>] [-l <EVENT LOCATION>]\n'
+    usage += '\t[-d <EVENT DESCRIPTION>] [-z <TIME ZONE> (default = America/New_York)]\n'
+    usage += '\t[-m <ALLOW MODIFY>] [-i <ALLOW INVITE OTHERS> [{true, false}] (default = true)]\n'
+    usage += '\t[-o <SHOW INVITEES> [{true, false}] (default = false)]\n'
+    usage += '\t[-r <RESPONSE STATUS>[{needsAction,declined,tentative,accepted}] (default = accepted)]\n'
 
-args = parser.parse_args('--attacker_email ATTACKER_EMAIL'.split())
+    #help
+    help = '\nThis module will connect to Google\'s API using an access token and'
+    help += 'inject a \ncalendar event into a target\'s calendar.'
+    help += '\n\narguments:'
+    help += '\n\t-e <ATTACKER EMAIL>, --attacker_email <ATTACKER EMAIL>'
+    help += '\n\t\t\tEmail address of the Google account you are doing the'
+    help += '\n\t\t\tinjection as. (Attacker email address)'
+    help += '\n\t-x <TARGETS> [TARGETS,...], --targets <TARGETS> [TARGETS ...]'
+    help += '\n\t\t\tComma-seperated list of victim email addresses'
+    help += '\n\t-a <ACCESS TOKEN>, --access_token <ACCESS TOKEN>'
+    help += '\n\t\t\tGoogle API Access Token.'
+    help += '\n\t-s <START DATETIME>, --start_DateTime <START DATETIME>'
+    help += '\n\t\t\tStart date and time for the event in the format of'
+    help += '\n\t\t\tYYYY-MM-DDTHH:MM:SSlike this: 2019-08-16T20:00:00 for'
+    help += '\n\t\t\tAugust 16, 2019 at 8:00:00 PM'
+    help += '\n\t-f <FINISH DATETIME>, --finish_DateTime <FINISH DATETIME>'
+    help += '\n\t\t\tFinish date and time for the event in the format of'
+    help += '\n\t\t\tYYYY-MM-DDTHH:MM:SSlike this: 2019-08-16T20:00:00 for'
+    help += '\n\t\t\tAugust 16, 2019 at 8:00:00 PM'
+    help += '\n\noptional arguments:'
+    help += '\n\t-t <EVENT TITLE>, --event_title <EVENT TITLE>'
+    help += '\n\t\t\tTitle of the Google calendar event'
+    help += '\n\t-l <EVENT LOCATION>, --event_location <EVENT LOCATION>'
+    help += '\n\t\t\tLocation field for the event'
+    help += '\n\t-d <EVENT DESCRIPTION>, --event_description <EVENT DESCRIPTION>'
+    help += '\n\t\t\tDescription field for the event'
+    help += '\n\t-z [<TIME ZONE>], --time_zone [<TIME ZONE>]'
+    help += '\n\t\t\tTime zone for the event in the format'
+    help += '\n\t\t\t"America/New_York" (default: America/New_York)'
+    help += '\n\t-m [{true, false}], --allow_modify [{true, false}]'
+    help += '\n\t\t\tIf set to true allows targets to modify the calendar'
+    help += '\n\t\t\tentry (default: false)'
+    help += '\n\t-i [{true, false}], --allow_invite_others [{true, false}]'
+    help += '\n\t\t\tIf set to true allows targets to invite others to the'
+    help += '\n\t\t\tcalendar entry (default: true)'
+    help += '\n\t-o [{true, false}], --show_invitees [{true, fasle}]'
+    help += '\n\t\t\tIf set to true will show all guests added to the event'
+    help += '\n\t\t\t(default: false)'
+    help += '\n\t-r [{needsAction,declined,tentative,accepted}],'
+    help += '\n\t\t\t--response_status [{needsAction,declined,tentative,accepted}]'
+    help += '\n\t\t\tCan be "needsAction", "declined", "tentative", or'
+    help += '\n\t\t\t"accepted" (default: accepted)'
+    help += '\n\n\t-h, --help\t\tshow this help message and exit\n'
 
+    try:
+        opts, args = getopt.getopt(argv, "he:x:a:s:f:t:l:d:z:m:i:o:r:",["help","attacker_email=",
+            "targets=","access_token=","start_DateTimeat=","finish_DateTime=","event_title=",
+            "event_location=","event_description=","time_zone=","allow_modify=","allow_invite_others=",
+            "show_invitees=","response_status="])
+    except getopt.GetoptError as err:
+        print str(err)
+        print(usage)
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print(help)
+            sys.exit()
+        if opt in ("-e", "--attacker_email"):
+            attacker_email = arg
+        if opt in ("-a", "--access_token"):
+                access_token = arg
+        if opt in ("-s", "--start_DateTime"):
+            start_DateTime = arg
+        if opt in ("-f", "--finish_DateTime"):
+            finish_DateTime = arg
+        if opt in ("-x", "--targets"):
+            targets = arg
+        if opt in ("-t", "--event_title"):
+            event_title = arg
+
+# Debugging
+    print("Access Token: " + access_token)
+    print("Attacker Email: " + attacker_email)
+    print("Start DateTime: " + start_DateTime)
+    print("Finish DateTime: " + finish_DateTime)
+    print("Targets: " + targets)
+    print("Event Title: " + event_title)
+# End Debugging
 
 # api endpoint
-URL = "https://www.googleapis.com/calendars/" + ATTACKER_EMAIL + "/events"
+#URL = "https://www.googleapis.com/calendars/" + ATTACKER_EMAIL + "/events"
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
