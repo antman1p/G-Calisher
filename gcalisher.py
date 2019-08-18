@@ -22,7 +22,7 @@ def main(argv):
     usage = '\nusage: gcalisher.py [-h] -e <ATTACKER EMAIL> -x <TARGETS> [TARGETS, ...]\n'
     usage += '\t-a <ACCESS TOKEN> -s <START DATETIME> -f <FINISH DATETIME>\n'
     usage += '\t[-t <EVENT TITLE>] [-l <EVENT LOCATION>]\n'
-    usage += '\t[-d <EVENT DESCRIPTION>] [-z <TIME ZONE> (default = America/New_York)]\n'
+    usage += '\t[-d <EVENT DESCRIPTION>] [-z <TIME ZONE> (default = America/Chicago)]\n'
     usage += '\t[-m <ALLOW MODIFY>] [-i <ALLOW INVITE OTHERS> [{true, false}] (default = true)]\n'
     usage += '\t[-o <SHOW INVITEES> [{true, false}] (default = false)]\n'
     usage += '\t[-r <RESPONSE STATUS>[{needsAction,declined,tentative,accepted}] (default = accepted)]\n'
