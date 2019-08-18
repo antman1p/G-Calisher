@@ -7,7 +7,7 @@ This is a python version of the powershell Mailsniper module Invoke-InjectGEvent
 (https://github.com/dafthack/MailSniper/blob/master/MailSniper.ps1) written by BlackHills Security's 
 Beau Bullock (@dafthack) & Michael Felch (@ustayready), with **added functionality**.
 ## Why?
-Becasue I'm a MacOS hacker and not everything is effing windows!  Also, Google STILL, since October 2018 has NOT FIXED 
+Because I'm a MacOS hacker and not everything is effing windows!  Also, Google STILL, since October 2018 has NOT FIXED 
 THEIR SH**!
 ## How?
 Original instructions on how to get a Google Calendar API key from 
