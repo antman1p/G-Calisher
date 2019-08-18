@@ -175,7 +175,7 @@ def main(argv):
     }
 
     # Tell the user what is going on
-    for target in target_list
+    for target in target_list:
         print("[*] Now injecting event into target calendar(s): " + target)
 
     # Post the requests
