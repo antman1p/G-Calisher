@@ -146,44 +146,45 @@ def main(argv):
     # Split target string into a list
     target_list = targets.split(",")
 
-    # Create a new list of json strings using the target and statas params
-    for target in target_list:
-        target_json_list.append('{\'email\': ' + target +
-            ', \'responseStatus\': ' + response_status + '},')
-
     # Event Data and header to be sent to the api
-    event = {
-        'kind': 'calendar#event',
-        'summary': event_title,
-        'location': event_location,
-        'description': event_description,
-        'start': {
-            'dateTime': start_DateTime,
-            'timeZone': time_zone,
-        },
-        'end': {
-            'dateTime': finish_DateTime,
-            'timeZone': time_zone
-        },
-        'attendees': target_json_list,
-        'guestsCanInviteOthers': allow_invite_others,
-        'guestsCanSeeOtherGuests': show_invitees,
-        'guestsCanModify': allow_modify
-    }
-    header = {
-        'Accept': '*/*',
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer " + access_token
-    }
-
-    # Tell the user what is going on
     for target in target_list:
+        event = {
+            'kind': 'calendar#event',
+            'summary': event_title,
+            'location': event_location,
+            'description': event_description,
+            'start': {
+                'dateTime': start_DateTime,
+                'timeZone': time_zone,
+            },
+            'end': {
+                'dateTime': finish_DateTime,
+                'timeZone': time_zone,
+            },
+            'attendees': [
+                {
+                    'email': target,
+                    'responseStatus': response_status,
+                },
+            ],
+            'guestsCanInviteOthers': allow_invite_others,
+            'guestsCanSeeOtherGuests': show_invitees,
+            'guestsCanModify': allow_modify,
+        }
+        header = {
+            'Accept': '*/*',
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + access_token,
+        }
+
+        # Tell the user what is going on
         print("[*] Now injecting event into target calendar(s): " + target)
 
-    # Post the requests
-    response = requests.post(URL, json= event, headers= header)
+        # Post the requests
+        response = requests.post(URL, json= event, headers= header)
 
-    print("Response: " + str(response) + "\n")
+        #print http response
+        print("Response: " + str(response) + "\n")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
