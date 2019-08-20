@@ -10,9 +10,25 @@ Beau Bullock (@dafthack) & Michael Felch (@ustayready), with **added functionali
 Because I'm a MacOS hacker and not everything is effing windows!  Also, Google STILL, since October 2018 has NOT FIXED 
 THEIR SH**!
 ## How?
-Original instructions on how to get a Google Calendar API key from 
 https://www.blackhillsinfosec.com/google-calendar-event-injection-mailsniper/  
-Updated instructions to follow.  
+Steps to get a Google API Access Token needed for connecting to the API
+ - A. Login to Google
+ - B. Go to https://console.developers.google.com/flows/enableapi?apiid=calendar&pli=1
+ - C. Create/select a Project and agree to ToS and continue
+ - D. Name your project and click "create"
+ - E. Click "Go to Credentials"
+ - F. On the "Add credentials to your project" page click cancel
+ - G. At the top of the page, select the "OAuth consent screen" tab. Select an Email address, enter a Product name if not already set, and click the Save button.
+ - H. Select the Credentials tab, click the Create credentials button and select OAuth client ID.
+ - I. Select the application type Web application, under "Authorized redirect URIs" paste in the following address: https://developers.google.com/oauthplayground". Then, click the Create button.
+ - J. Copy your "Client ID" and "Client Secret"
+ - K. Navigate here: https://developers.google.com/oauthplayground/
+ - L. Click the "gear icon" in the upper right corner and check the box to "Use your own OAuth credentials". Enter the OAuth2 client ID and OAuth2 client secret in the boxes.
+ - M. Make sure that "OAuth flow" is set to Server-side, and "Access Type" is set to offline.
+ - N. Select the "Calendar API v3" dropdown and click both URLs to add them to scope. Click Authorize APIs
+ - O. Select the account you want to authorize, then click Allow. (If there is an error such as "Error: redirect_uri_mismatch" then it's possible the changes haven't propagated yet. Just wait a few minutes, hit the back button and try to authorize again.)
+ - P. You should now be at "Step 2: Exchange authorization code for tokens." Click the "Exchange authorization code for tokens button". The "Access token" is item we need for accessing the API. Copy the value of the "Access token."
+
   
 ```
 usage: gcalisher.py [-h] -e <ATTACKER EMAIL> -x <TARGETS> [TARGETS, ...]   
