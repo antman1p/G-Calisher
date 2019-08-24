@@ -27,7 +27,7 @@ Steps to get a Google API Access Token needed for connecting to the API
  - 13. Make sure that "OAuth flow" is set to Server-side, and "Access Type" is set to offline.
  - 14. Select the "Calendar API v3" dropdown and click both URLs to add them to scope. Click Authorize APIs
  - 15. Select the account you want to authorize, then click Allow. (If there is an error such as "Error: redirect_uri_mismatch" then it's possible the changes haven't propagated yet. Just wait a few minutes, hit the back button and try to authorize again.)
- - 16. You should now be at "Step 2: Exchange authorization code for tokens." Click the "Exchange authorization code for tokens button". The "Access token" is item we need for accessing the API. Copy the value of the "Access token."
+ - 16. You should now be at "Step 2: Exchange authorization code for tokens." Click the "Exchange authorization code for tokens button". The "Access token" is the item we need for accessing the API. Copy the value of the "Access token."
 
   
 ```
