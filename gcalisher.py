@@ -19,6 +19,7 @@ def main(argv):
     allow_invite_others = "true"
     show_invitees = "false"
     response_status = "accepted"
+    set_reminders = "none"
 
     # usage
     usage = '\nusage: gcalisher.py [-h] -e <ATTACKER EMAIL> -x <TARGETS> [TARGETS, ...]\n'
@@ -28,6 +29,7 @@ def main(argv):
     usage += '\t[-m <ALLOW MODIFY>] [-i <ALLOW INVITE OTHERS> [{true, false}] (default = true)]\n'
     usage += '\t[-o <SHOW INVITEES> [{true, false}] (default = false)]\n'
     usage += '\t[-r <RESPONSE STATUS>[{needsAction,declined,tentative,accepted}] (default = accepted)]\n'
+    usage += '\t[-n <SET REMINDERS> [{email,popup,both,none}] (default = none)\n'
 
     #help
     help = '\nThis module will connect to Google\'s API using an access token and'
@@ -71,14 +73,18 @@ def main(argv):
     help += '\n\t\t\t--response_status [{needsAction,declined,tentative,accepted}]'
     help += '\n\t\t\tCan be "needsAction", "declined", "tentative", or'
     help += '\n\t\t\t"accepted" (default: accepted)'
+    help += '\n\t-n [{email,popup,both,none}], --set_reminders [{email,popup,both,none}],'
+    help += '\n\t\t\tCan be "email", "popup", "both", or "none".  Will send the reminder'
+    help += '\n\t\t\tChosen, 5 minutes before the event'
+    help += '\n\t\t\t(default: none)'
     help += '\n\n\t-h, --help\t\tshow this help message and exit\n'
 
 # Try parsing options and arguments
     try:
-        opts, args = getopt.getopt(argv, "he:x:a:s:f:t:l:d:z:m:i:o:r:",["help","attacker_email=",
+        opts, args = getopt.getopt(argv, "he:x:a:s:f:t:l:d:z:m:i:o:r:n:",["help","attacker_email=",
             "targets=","access_token=","start_DateTimeat=","finish_DateTime=","event_title=",
             "event_location=","event_description=","time_zone=","allow_modify=","allow_invite_others=",
-            "show_invitees=","response_status="])
+            "show_invitees=","response_status=","set_reminders="])
     except getopt.GetoptError as err:
         print str(err)
         print(usage)
@@ -148,29 +154,121 @@ def main(argv):
 
     # Event Data and header to be sent to the api
     for target in target_list:
-        event = {
-            'kind': 'calendar#event',
-            'summary': event_title,
-            'location': event_location,
-            'description': event_description,
-            'start': {
-                'dateTime': start_DateTime,
-                'timeZone': time_zone,
-            },
-            'end': {
-                'dateTime': finish_DateTime,
-                'timeZone': time_zone,
-            },
-            'attendees': [
-                {
-                    'email': target,
-                    'responseStatus': response_status,
+        if set_reminders == "email" :
+            event = {
+                'kind': 'calendar#event',
+                'summary': event_title,
+                'location': event_location,
+                'description': event_description,
+                'start': {
+                    'dateTime': start_DateTime,
+                    'timeZone': time_zone,
                 },
-            ],
-            'guestsCanInviteOthers': allow_invite_others,
-            'guestsCanSeeOtherGuests': show_invitees,
-            'guestsCanModify': allow_modify,
-        }
+                'end': {
+                    'dateTime': finish_DateTime,
+                    'timeZone': time_zone,
+                },
+                'attendees': [
+                    {
+                        'email': target,
+                        'responseStatus': response_status,
+                    },
+                ],
+                'reminders': {
+                    'useDefault': False,
+                    'overrides': [
+                        {'method': 'email', 'minutes': 5},
+                    ],
+                },
+                'guestsCanInviteOthers': allow_invite_others,
+                'guestsCanSeeOtherGuests': show_invitees,
+                'guestsCanModify': allow_modify,
+            }
+        elif set_reminders == "popup" :
+                event = {
+                    'kind': 'calendar#event',
+                    'summary': event_title,
+                    'location': event_location,
+                    'description': event_description,
+                    'start': {
+                        'dateTime': start_DateTime,
+                        'timeZone': time_zone,
+                    },
+                    'end': {
+                        'dateTime': finish_DateTime,
+                        'timeZone': time_zone,
+                    },
+                    'attendees': [
+                        {
+                            'email': target,
+                            'responseStatus': response_status,
+                        },
+                    ],
+                    'reminders': {
+                        'useDefault': False,
+                        'overrides': [
+                            {'method': 'popup', 'minutes': 5},
+                        ],
+                    },
+                    'guestsCanInviteOthers': allow_invite_others,
+                    'guestsCanSeeOtherGuests': show_invitees,
+                    'guestsCanModify': allow_modify,
+                }
+        elif set_reminders == "both" :
+                event = {
+                    'kind': 'calendar#event',
+                    'summary': event_title,
+                    'location': event_location,
+                    'description': event_description,
+                    'start': {
+                        'dateTime': start_DateTime,
+                        'timeZone': time_zone,
+                    },
+                    'end': {
+                        'dateTime': finish_DateTime,
+                        'timeZone': time_zone,
+                    },
+                    'attendees': [
+                        {
+                            'email': target,
+                            'responseStatus': response_status,
+                        },
+                    ],
+                    'reminders': {
+                        'useDefault': False,
+                        'overrides': [
+                            {'method': 'popup', 'minutes': 5},
+                            {'method': 'email', 'minutes': 5},
+                        ],
+                    },
+                    'guestsCanInviteOthers': allow_invite_others,
+                    'guestsCanSeeOtherGuests': show_invitees,
+                    'guestsCanModify': allow_modify,
+                }
+        else :
+                event = {
+                    'kind': 'calendar#event',
+                    'summary': event_title,
+                    'location': event_location,
+                    'description': event_description,
+                    'start': {
+                        'dateTime': start_DateTime,
+                        'timeZone': time_zone,
+                    },
+                    'end': {
+                        'dateTime': finish_DateTime,
+                        'timeZone': time_zone,
+                    },
+                    'attendees': [
+                        {
+                            'email': target,
+                            'responseStatus': response_status,
+                        },
+                    ],
+                    'guestsCanInviteOthers': allow_invite_others,
+                    'guestsCanSeeOtherGuests': show_invitees,
+                    'guestsCanModify': allow_modify,
+                }
         header = {
             'Accept': '*/*',
             'Content-Type': 'application/json',

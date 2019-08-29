@@ -37,7 +37,8 @@ usage: gcalisher.py [-h] -e <ATTACKER EMAIL> -x <TARGETS> [TARGETS, ...]
 	[-d <EVENT DESCRIPTION>] [-z <TIME ZONE> (default = America/Chicago)]   
 	[-m <ALLOW MODIFY>] [-i <ALLOW INVITE OTHERS> [{true, false}] (default = true)]   
 	[-o <SHOW INVITEES> [{true, false}] (default = false)]   
-	[-r <RESPONSE STATUS>[{needsAction,declined,tentative,accepted}] (default = accepted)] 
+	[-r <RESPONSE STATUS>[{needsAction,declined,tentative,accepted}] (default = accepted)]
+	[-n <SET REMINDERS> [{email,popup,both,none}] (default = none) 
 
 help:
 
@@ -81,7 +82,10 @@ optional arguments:
 			--response_status [{needsAction,declined,tentative,accepted}]
 			Can be "needsAction", "declined", "tentative", or
 			"accepted" (default: accepted)
-
+	-n [{email,popup,both,none}], --set_reminders [{email,popup,both,none}],
+			Can be "email", "popup", "both", or "none".  Will send the reminder
+			Chosen, 5 minutes before the event
+			(default: none)
 	-h, --help		show this help message and exit
 
 ```
