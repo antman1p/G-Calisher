@@ -175,7 +175,7 @@ def main(argv):
                     },
                 ],
                 'reminders': {
-                    'useDefault': False,
+                    'useDefault': false,
                     'overrides': [
                         {'method': 'email', 'minutes': 5},
                     ],
@@ -205,7 +205,7 @@ def main(argv):
                         },
                     ],
                     'reminders': {
-                        'useDefault': False,
+                        'useDefault': false,
                         'overrides': [
                             {'method': 'popup', 'minutes': 5},
                         ],
@@ -235,7 +235,7 @@ def main(argv):
                         },
                     ],
                     'reminders': {
-                        'useDefault': False,
+                        'useDefault': false,
                         'overrides': [
                             {'method': 'popup', 'minutes': 5},
                             {'method': 'email', 'minutes': 5},
