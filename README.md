@@ -29,7 +29,11 @@ Steps to get a Google API Access Token needed for connecting to the API
  - 15. Select the account you want to authorize, then click Allow. (If there is an error such as "Error: redirect_uri_mismatch" then it's possible the changes haven't propagated yet. Just wait a few minutes, hit the back button and try to authorize again.)
  - 16. You should now be at "Step 2: Exchange authorization code for tokens." Click the "Exchange authorization code for tokens button". The "Access token" is the item we need for accessing the API. Copy the value of the "Access token."
 
-  
+## Dependencies
+Python Requests library:
+`pip install requests`
+
+## Usage
 ```
 usage: gcalisher.py [-h] -e <ATTACKER EMAIL> -x <TARGETS> [TARGETS, ...]   
 	-a <ACCESS TOKEN> -s <START DATETIME> -f <FINISH DATETIME>  
