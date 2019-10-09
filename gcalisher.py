@@ -173,6 +173,7 @@ def main(argv):
         }
         header = {
             'Accept': '*/*',
+            'User-Agent': 'G-Calisher Agent',
             'Content-Type': 'application/json',
             'Authorization': "Bearer " + access_token,
         }
